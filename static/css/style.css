@@ -1,0 +1,419 @@
+:root {
+  --bb-yellow: #ffef00;
+  --bb-blue: #0033a0;
+  --bb-blue-deep: #1d2a7a;
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #d6dbe4;
+  --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  --danger: #b91c1c;
+  --danger-bg: #fee2e2;
+  --warn-bg: #fff7d6;
+  --warn-border: #f5d76e;
+  --success-bg: #eef7ff;
+  --success-border: #bfdcff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, rgba(255, 239, 0, 0.10), rgba(255, 255, 255, 0)), var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.topbar {
+  padding: 18px 16px 10px;
+}
+
+.brand {
+  max-width: 1040px;
+  margin: 0 auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow);
+}
+
+.brand-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--bb-blue-deep);
+}
+
+.brand-text p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 10px 16px 32px;
+}
+
+.progress-card,
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.progress-card {
+  margin-bottom: 16px;
+}
+
+.progress-line {
+  margin-bottom: 12px;
+}
+
+.progress-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 1rem;
+}
+
+.step-name {
+  color: var(--bb-blue);
+  font-weight: 700;
+}
+
+.progressbar {
+  width: 100%;
+  height: 10px;
+  background: #e8edf5;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progressbar-fill {
+  height: 100%;
+  width: 20%;
+  background: linear-gradient(90deg, var(--bb-yellow), var(--bb-blue));
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.progress-actions {
+  margin-top: 14px;
+}
+
+.form-step {
+  display: none;
+  gap: 16px;
+}
+
+.form-step.active {
+  display: grid;
+}
+
+.card {
+  margin-bottom: 16px;
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+.form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.two-cols {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.three-cols {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.banco-grid {
+  grid-template-columns: 3fr 1fr;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+label {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.req {
+  color: var(--danger);
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid rgba(0, 51, 160, 0.12);
+  border-color: var(--bb-blue);
+}
+
+.choice-list,
+.mini-choice-list {
+  display: grid;
+  gap: 12px;
+}
+
+input.valor-input {
+  text-align: right;
+}
+
+input.valor-input::placeholder {
+  text-align: right;
+}
+
+.choice-list.compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.inline-options {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.choice-card,
+.mini-choice,
+.declaration-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px;
+  background: #fff;
+}
+
+.choice-card input,
+.mini-choice input,
+.declaration-box input {
+  width: auto;
+  min-height: auto;
+  margin-top: 3px;
+}
+
+.choice-card strong,
+.mini-choice span {
+  display: block;
+}
+
+.inline-alert,
+.checklist-box,
+.summary-box,
+.step-error,
+.value-inputs-box {
+  margin-top: 14px;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.inline-alert {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  color: #7a5a00;
+}
+
+.checklist-box,
+.summary-box {
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+}
+
+.step-error {
+  background: var(--danger-bg);
+  border: 1px solid #f0b1b1;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.value-inputs-box {
+  border: 1px solid #a8cdfd;
+  background: #f8fbff;
+}
+
+.value-type-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.nav-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 8px 0 24px;
+}
+
+.primary-btn,
+.secondary-btn,
+.ghost-btn {
+  border: none;
+  border-radius: 14px;
+  min-height: 48px;
+  padding: 12px 18px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.primary-btn {
+  background: var(--bb-blue);
+  color: #fff;
+}
+
+.secondary-btn {
+  background: #e9eef6;
+  color: #23324d;
+}
+
+.ghost-btn {
+  background: transparent;
+  color: var(--bb-blue);
+  border: 1px solid #c8d8f5;
+}
+
+.field-error,
+.group-error {
+  color: var(--danger);
+  font-size: 0.88rem;
+  min-height: 1em;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.invalid {
+  border-color: var(--danger) !important;
+  background: var(--danger-bg);
+}
+
+.invalid-group {
+  border: 1px solid #efb0b0;
+  border-radius: 16px;
+  padding: 10px;
+  background: #fff7f7;
+}
+
+@media (max-width: 900px) {
+  .two-cols,
+  .three-cols,
+  .choice-list.compact,
+  .value-type-row,
+  .banco-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.label-with-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.label-with-action .link-action {
+  font-size: 0.85em;
+  font-style: italic;
+  color: #1a73e8;
+  text-decoration: none;
+  font-weight: 400;
+}
+
+.label-with-action .link-action:hover {
+  text-decoration: underline;
+}
+
+.label-prefixo_outra_uf{
+  color: #e8391a;
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    padding: 14px 12px 8px;
+  }
+
+  .page {
+    padding: 8px 12px 28px;
+  }
+
+  .brand {
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  .brand-logo {
+    width: 56px;
+    height: 56px;
+  }
+
+  .brand-text h1 {
+    font-size: 1.1rem;
+  }
+
+  .progress-card,
+  .card {
+    border-radius: 18px;
+    padding: 16px;
+  }
+
+  .nav-actions {
+    flex-direction: column;
+  }
+
+  .primary-btn,
+  .secondary-btn,
+  .ghost-btn {
+    width: 100%;
+  }
+}

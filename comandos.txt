@@ -1,0 +1,26 @@
+H:
+cd H:\Hyego\Documents\GitHub\DJO
+venv\Scripts\activate
+python app.py
+
+
+&nbsp;
+🔍
+🧽
+📖
+✏️
+🗑
+➕
+✔️
+❌
+🚫
+❓
+📄
+🖨️
+💾
+
+H:
+cd H:\Hyego\Documents\GitHub\DJO
+.tables
+.quit
+PRAGMA table_info(nomedatabela);

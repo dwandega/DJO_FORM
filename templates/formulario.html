@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solicitação de Resgate</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="{{ url_for('static', filename='logoBB.png') }}" alt="Logo BB" class="brand-logo">
+        <div class="brand-text">
+          <h1>Solicitação de Resgate</h1>
+          <p>Formulário organizado em etapas para facilitar seu preenchimento.</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="progress-card">
+        <div class="progress-line">
+          <div class="progress-meta">
+            <span>Etapa <strong id="currentStepLabel">1/5</strong></span>
+            <span class="step-name" id="currentStepName">Identificação</span>
+          </div>
+        </div>
+
+        <div class="progressbar">
+          <div class="progressbar-fill" id="progressFill"></div>
+        </div>
+
+        <div class="progress-actions">
+          <button type="button" id="toggleAllBtn" class="ghost-btn">Ver formulário completo</button>
+        </div>
+      </section>
+
+      <form id="resgateForm" novalidate>
+        <section class="form-step active" data-step="1" data-step-name="Identificação">
+          <div class="step-error hidden" id="error-step-1"></div>
+
+          <div class="card">
+            <h3>1. Identificação do beneficiário</h3>
+            <div class="form-grid two-cols">
+              <div class="field">
+                <label for="beneficiario_nome">Nome do beneficiário <span class="req">*</span></label>
+                <input id="beneficiario_nome" name="beneficiario_nome" required>
+                <small class="field-error"></small>
+              </div>
+
+              <div class="field">
+                <label for="beneficiario_cpf_cnpj">CPF/CNPJ do beneficiário <span class="req">*</span></label>
+                <input id="beneficiario_cpf_cnpj" name="beneficiario_cpf_cnpj" required>
+                <small class="field-error"></small>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>2. Representante legal ou procurador</h3>
+            <div class="form-grid two-cols">
+              <div class="field">
+                <label for="representante_nome">Nome do representante legal ou procurador</label>
+                <input id="representante_nome" name="representante_nome">
+                <small class="field-error"></small>
+              </div>
+
+              <div class="field">
+                <label for="representante_cpf_cnpj">CPF do representante legal ou procurador</label>
+                <input id="representante_cpf_cnpj" name="representante_cpf_cnpj" maxlength="14">
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <div class="inline-alert hidden" id="alertaProcuracao">
+              A procuração deve ser atual, passível de validação e constar em uma:<br>
+              ● Certidão de Objeto e Pé<br>
+              ● Certidão de Militancia<br>
+              ● Certidão Narratória
+            </div>
+          </div>
+        </section>
+
+        <section class="form-step" data-step="2" data-step-name="Resgate">
+          <div class="step-error hidden" id="error-step-2"></div>
+
+          <div class="card">
+            <h3>3. Tipo do resgate <span class="req">*</span></h3>
+            <div class="choice-list">
+              <label class="choice-card">
+                <input type="radio" name="tipo_resgate" value="estadual" required>
+                <span><strong>Depósito Estadual</strong></span>
+              </label>
+
+              <label class="choice-card">
+                <input type="radio" name="tipo_resgate" value="trabalhista" required>
+                <span><strong>Depósito Trabalhista</strong></span>
+              </label>
+
+              <label class="choice-card">
+                <input type="radio" name="tipo_resgate" value="precatorio_federal" required>
+                <span><strong>Precatório ou RPV Federal</strong></span>
+              </label>
+            </div>
+            <small class="group-error" data-group-error-for="tipo_resgate"></small>
+          </div>
+
+          <div class="card">
+            <h3>4. Conta judicial</h3>
+
+            <div class="field">
+              <label>Possui o número da conta judicial?</label>
+              <div class="mini-choice-list inline-options">
+                <label class="mini-choice">
+                  <input type="radio" name="possui_conta_judicial" value="nao" checked>
+                  <span>Não</span>
+                </label>
+                <label class="mini-choice">
+                  <input type="radio" name="possui_conta_judicial" value="sim">
+                  <span>Sim</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="hidden" id="blocoContasJudiciais">
+              <div class="form-grid three-cols">
+                <div class="field">
+                  <label for="conta_judicial_1">Conta judicial 1</label>
+                  <input id="conta_judicial_1" name="conta_judicial_1">
+                  <small class="field-error"></small>
+                </div>
+
+                <div class="field">
+                  <label for="conta_judicial_2">Conta judicial 2</label>
+                  <input id="conta_judicial_2" name="conta_judicial_2">
+                  <small class="field-error"></small>
+                </div>
+
+                <div class="field">
+                  <label for="conta_judicial_3">Conta judicial 3</label>
+                  <input id="conta_judicial_3" name="conta_judicial_3">
+                  <small class="field-error"></small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-step" data-step="3" data-step-name="Recebimento">
+          <div class="step-error hidden" id="error-step-3"></div>
+
+          <div class="card">
+            <h3>5. Forma de recebimento <span class="req">*</span></h3>
+
+            <div class="choice-list">
+              <label class="choice-card">
+                <input type="radio" name="forma_recebimento" value="autorizacao_permanente" required>
+                <span><strong>Autorização permanente para crédito em conta do beneficiário no Banco do
+                    Brasil</strong></span>
+              </label>
+
+              <label class="choice-card">
+                <input type="radio" name="forma_recebimento" value="convenio_djc" required>
+                <span><strong>Convênio de resgate centralizado – DJC</strong></span>
+              </label>
+
+              <label class="choice-card">
+                <input type="radio" name="forma_recebimento" value="credito" required>
+                <span><strong>Crédito em Conta BB ou TED</strong></span>
+              </label>
+
+              <label class="choice-card">
+                <input type="radio" name="forma_recebimento" value="especie" required>
+                <span><strong>Pagamento em espécie</strong></span>
+              </label>
+            </div>
+            <small class="group-error" data-group-error-for="forma_recebimento"></small>
+          </div>
+
+          <div class="card hidden" id="blocoSubcredito">
+            <h3>6. Destinação do crédito <span class="req">*</span></h3>
+
+            <div class="choice-list compact">
+              <label class="choice-card">
+                <input type="radio" name="credito_destino" value="beneficiario">
+                <span><strong>Conta do beneficiário</strong></span>
+              </label>
+
+              <label class="choice-card">
+                <input type="radio" name="credito_destino" value="representante">
+                <span><strong>Conta do representante</strong></span>
+              </label>
+
+              <label class="choice-card">
+                <input type="radio" name="credito_destino" value="ambos">
+                <span><strong>Ambos</strong></span>
+              </label>
+            </div>
+            <small class="group-error" data-group-error-for="credito_destino"></small>
+            <div class="inline-alert hidden" id="alertaDivisaoCredito"></div>
+          </div>
+
+          <div class="card hidden" id="blocoCreditoBeneficiario">
+            <h3>6.1 Dados para crédito ao beneficiário</h3>
+
+            <div class="form-grid banco-grid">
+              <div class="field bank-name-field">
+                <label for="cb_banco_select">Banco</label>
+                <select id="cb_banco_select" name="cb_banco_select">
+                  <option value="">Selecione</option>
+                  <option value="001">Banco do Brasil</option>
+                  <option value="104">Caixa Econômica Federal</option>
+                  <option value="237">Bradesco</option>
+                  <option value="341">Itaú</option>
+                  <option value="033">Santander</option>
+                  <option value="260">Nubank</option>
+                  <option value="077">Banco Inter</option>
+                  <option value="756">Sicoob</option>
+                  <option value="748">Sicredi</option>
+                  <option value="422">Banco Safra</option>
+                  <option value="208">BTG Pactual</option>
+                  <option value="336">C6 Bank</option>
+                  <option value="212">Banco Original</option>
+                  <option value="041">Banrisul</option>
+                  <option value="004">Banco do Nordeste</option>
+                  <option value="outro">Outro</option>
+                </select>
+                <small class="field-error"></small>
+              </div>
+
+              <div class="field bank-code-field">
+                <label for="cb_numero">Código do banco</label>
+                <input id="cb_numero" name="cb_numero" readonly>
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <div class="form-grid two-cols hidden" id="cb_outro_banco_wrap">
+              <div class="field">
+                <label for="cb_outro_banco_nome">Nome do banco</label>
+                <input id="cb_outro_banco_nome" name="cb_outro_banco_nome">
+                <small class="field-error"></small>
+              </div>
+              <div class="field">
+                <label for="cb_outro_banco_numero">Código do banco</label>
+                <input id="cb_outro_banco_numero" name="cb_outro_banco_numero">
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <div class="form-grid two-cols">
+              <div class="field">
+                <label for="cb_agencia">Agência</label>
+                <input id="cb_agencia" name="cb_agencia">
+                <small class="field-error"></small>
+              </div>
+              <div class="field">
+                <label for="cb_conta">Conta</label>
+                <input id="cb_conta" name="cb_conta">
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <div class="form-grid two-cols">
+              <div class="field">
+                <label for="cb_nome" class="label-with-action">
+                  <span>Nome</span>
+                  <a href="#" class="link-action" data-import="beneficiario" data-target="cb">importar dados</a>
+                </label>
+                <input id="cb_nome" name="cb_nome">
+                <small class="field-error"></small>
+              </div>
+              <div class="field">
+                <label for="cb_cpf_cnpj">CPF/CNPJ</label>
+                <input id="cb_cpf_cnpj" name="cb_cpf_cnpj">
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <div class="form-grid two-cols">
+              <div class="field">
+                <label>Tipo de conta <span class="req">*</span></label>
+                <div class="mini-choice-list inline-options">
+                  <label class="mini-choice">
+                    <input type="radio" name="cb_tipo_conta" value="corrente">
+                    <span>Conta Corrente</span>
+                  </label>
+                  <label class="mini-choice">
+                    <input type="radio" name="cb_tipo_conta" value="poupanca">
+                    <span>Poupança</span>
+                  </label>
+                </div>
+                <small class="group-error" data-group-error-for="cb_tipo_conta"></small>
+              </div>
+
+              <div class="field hidden" id="cb_variacao_wrap">
+                <label for="cb_variacao">Variação da poupança</label>
+                <input id="cb_variacao" name="cb_variacao" placeholder="Ex.: 51 (a mais comum)">
+                <small class="field-error"></small>
+              </div>
+
+            </div>
+
+            <div class="field">
+              <label>Tipo de valor <span class="req">*</span></label>
+              <div class="mini-choice-list value-type-row">
+                <label class="mini-choice">
+                  <input type="radio" name="cb_valor_tipo" value="total">
+                  <span>Total / saldo remanescente</span>
+                </label>
+                <label class="mini-choice">
+                  <input type="radio" name="cb_valor_tipo" value="fixo">
+                  <span>Fixo</span>
+                </label>
+                <label class="mini-choice">
+                  <input type="radio" name="cb_valor_tipo" value="parcial">
+                  <span>Parcial</span>
+                </label>
+                <label class="mini-choice">
+                  <input type="radio" name="cb_valor_tipo" value="percentual">
+                  <span>Percentual</span>
+                </label>
+              </div>
+              <small class="group-error" data-group-error-for="cb_valor_tipo"></small>
+            </div>
+
+            <div class="value-inputs-box hidden" id="cb_valor_campos">
+              <div class="form-grid three-cols">
+                <div class="field hidden" id="cb_valor_fixo_wrap">
+                  <label for="cb_valor_fixo">Valor fixo</label>
+                  <input id="cb_valor_fixo" name="cb_valor_fixo" class="valor-input" placeholder="0,00">
+                  <small class="field-error"></small>
+                </div>
+
+                <div class="field hidden" id="cb_valor_parcial_wrap">
+                  <label for="cb_valor_parcial">Valor parcial</label>
+                  <input id="cb_valor_parcial" name="cb_valor_parcial" class="valor-input" placeholder="0,00">
+                  <small class="field-error"></small>
+                </div>
+
+                <div class="field hidden" id="cb_percentual_wrap">
+                  <label for="cb_percentual">Percentual</label>
+                  <input id="cb_percentual" name="cb_percentual" class="valor-input" placeholder="00%">
+                  <small class="field-error"></small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card hidden" id="blocoCreditoRepresentante">
+            <h3>6.2 Dados para crédito ao representante legal</h3>
+
+            <div class="form-grid banco-grid">
+              <div class="field bank-name-field">
+                <label for="cr_banco_select">Banco</label>
+                <select id="cr_banco_select" name="cr_banco_select">
+                  <option value="">Selecione</option>
+                  <option value="001">Banco do Brasil</option>
+                  <option value="104">Caixa Econômica Federal</option>
+                  <option value="237">Bradesco</option>
+                  <option value="341">Itaú</option>
+                  <option value="033">Santander</option>
+                  <option value="260">Nubank</option>
+                  <option value="077">Banco Inter</option>
+                  <option value="756">Sicoob</option>
+                  <option value="748">Sicredi</option>
+                  <option value="422">Banco Safra</option>
+                  <option value="208">BTG Pactual</option>
+                  <option value="336">C6 Bank</option>
+                  <option value="212">Banco Original</option>
+                  <option value="041">Banrisul</option>
+                  <option value="004">Banco do Nordeste</option>
+                  <option value="outro">Outro</option>
+                </select>
+                <small class="field-error"></small>
+              </div>
+
+              <div class="field bank-code-field">
+                <label for="cr_numero">Código do banco</label>
+                <input id="cr_numero" name="cr_numero" readonly>
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <div class="form-grid two-cols hidden" id="cr_outro_banco_wrap">
+              <div class="field">
+                <label for="cr_outro_banco_nome">Nome do banco</label>
+                <input id="cr_outro_banco_nome" name="cr_outro_banco_nome">
+                <small class="field-error"></small>
+              </div>
+              <div class="field">
+                <label for="cr_outro_banco_numero">Código do banco</label>
+                <input id="cr_outro_banco_numero" name="cr_outro_banco_numero">
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <div class="form-grid two-cols">
+              <div class="field">
+                <label for="cr_agencia">Agência</label>
+                <input id="cr_agencia" name="cr_agencia">
+                <small class="field-error"></small>
+              </div>
+              <div class="field">
+                <label for="cr_conta">Conta</label>
+                <input id="cr_conta" name="cr_conta">
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <div class="form-grid two-cols">
+              <div class="field">
+                <label for="cr_nome" class="label-with-action">
+                  <span>Nome</span>
+                  <a href="#" class="link-action" data-import="representante" data-target="cr">importar dados</a>
+                </label>
+                <input id="cr_nome" name="cr_nome">
+                <small class="field-error"></small>
+              </div>
+              <div class="field">
+                <label for="cr_cpf_cnpj">CPF/CNPJ</label>
+                <input id="cr_cpf_cnpj" name="cr_cpf_cnpj">
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <div class="form-grid two-cols">
+              <div class="field">
+                <label>Tipo de conta <span class="req">*</span></label>
+                <div class="mini-choice-list inline-options">
+                  <label class="mini-choice">
+                    <input type="radio" name="cr_tipo_conta" value="corrente">
+                    <span>Conta Corrente</span>
+                  </label>
+                  <label class="mini-choice">
+                    <input type="radio" name="cr_tipo_conta" value="poupanca">
+                    <span>Poupança</span>
+                  </label>
+                </div>
+                <small class="group-error" data-group-error-for="cr_tipo_conta"></small>
+              </div>
+
+              <div class="field hidden" id="cr_variacao_wrap">
+                <label for="cr_variacao">Variação da poupança</label>
+                <input id="cr_variacao" name="cr_variacao" placeholder="Ex.: 51 (a mais comum)">
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Tipo de valor <span class="req">*</span></label>
+              <div class="mini-choice-list value-type-row">
+                <label class="mini-choice">
+                  <input type="radio" name="cr_valor_tipo" value="total">
+                  <span>Total / saldo remanescente</span>
+                </label>
+                <label class="mini-choice">
+                  <input type="radio" name="cr_valor_tipo" value="fixo">
+                  <span>Fixo</span>
+                </label>
+                <label class="mini-choice">
+                  <input type="radio" name="cr_valor_tipo" value="parcial">
+                  <span>Parcial</span>
+                </label>
+                <label class="mini-choice">
+                  <input type="radio" name="cr_valor_tipo" value="percentual">
+                  <span>Percentual</span>
+                </label>
+              </div>
+              <small class="group-error" data-group-error-for="cr_valor_tipo"></small>
+            </div>
+
+            <div class="value-inputs-box hidden" id="cr_valor_campos">
+              <div class="form-grid three-cols">
+                <div class="field hidden" id="cr_valor_fixo_wrap">
+                  <label for="cr_valor_fixo">Valor fixo</label>
+                  <input id="cr_valor_fixo" name="cr_valor_fixo" class="valor-input" placeholder="0,00">
+                  <small class="field-error"></small>
+                </div>
+
+                <div class="field hidden" id="cr_valor_parcial_wrap">
+                  <label for="cr_valor_parcial">Valor parcial</label>
+                  <input id="cr_valor_parcial" name="cr_valor_parcial" class="valor-input" placeholder="0,00">
+                  <small class="field-error"></small>
+                </div>
+
+                <div class="field hidden" id="cr_percentual_wrap">
+                  <label for="cr_percentual">Percentual</label>
+                  <input id="cr_percentual" name="cr_percentual" class="valor-input" placeholder="00%">
+                  <small class="field-error"></small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card hidden" id="blocoEspecie">
+            <h3>6. Pagamento em espécie</h3>
+            <div class="form-grid two-cols">
+              <div class="field">
+                <label for="prefixo_outra_uf">Prefixo da agência em outra UF</label>
+                <input id="prefixo_outra_uf" name="prefixo_outra_uf" placeholder="Informe apenas se for em outra UF">
+                <small class="field-error"></small>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-step" data-step="4" data-step-name="Regras">
+          <div class="step-error hidden" id="error-step-4"></div>
+
+          <div class="card hidden" id="blocoIR">
+            <h3>7. Imposto de renda</h3>
+            <div class="choice-list compact">
+              <label>Beneficiário declara ser isento ou que os valores a receber são isentos:</label>
+              <label class="choice-card">
+                <input type="radio" name="isento_ir" value="sim">
+                <span><strong>Sim</strong></span>
+              </label>
+
+              <label class="choice-card">
+                <input type="radio" name="isento_ir" value="nao">
+                <span><strong>Não</strong></span>
+              </label>
+            </div>
+
+            <div class="inline-alert hidden" id="alertaIR">
+              Quando por representante legal, a procuração precisa de poderes específicos para tal.
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Situação excepcional</h3>
+
+            <div class="field">
+              <label>Beneficiário analfabeto?</label>
+              <div class="mini-choice-list inline-options">
+                <label class="mini-choice">
+                  <input type="radio" name="beneficiario_analfabeto" value="nao" checked>
+                  <span>Não</span>
+                </label>
+                <label class="mini-choice">
+                  <input type="radio" name="beneficiario_analfabeto" value="sim">
+                  <span>Sim</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="inline-alert hidden" id="alertaAnalfabeto">
+              <p>Esta opção é voltada apenas para preenchimento por parte do beneficiário.</p>
+              <p>O formulário deverá ser impresso e apresentado na agência pelo beneficiário, acompanhado de duas testemunhas que
+                possam assinar.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Checklist dinâmico</h3>
+            <div class="checklist-box" id="checklistContainer">
+              Selecione as opções relevantes para visualizar os pontos de atenção.
+            </div>
+          </div>
+        </section>
+
+        <section class="form-step" data-step="5" data-step-name="Confirmação">
+          <div class="step-error hidden" id="error-step-5"></div>
+
+          <div class="card">
+            <h3>8. Dados para contato</h3>
+            <div class="form-grid three-cols">
+
+              <div class="field">
+                <label for="telefone">Casa / Escritorio</label>
+                <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000">
+                <small class="field-error"></small>
+              </div>
+
+              <div class="field">
+                <label for="celular">Celular <span class="req">*</span></label>
+                <input type="tel" id="celular" name="celular" required placeholder="(00) 00000-0000">
+                <small class="field-error"></small>
+              </div>
+
+              <div class="field">
+                <label for="email">E-mail</label>
+                <input id="email" name="email" type="email">
+                <small class="field-error"></small>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>9. Local, data e declaração</h3>
+            <div class="form-grid two-cols">
+              <div class="field">
+                <label for="local">Local <span class="req">*</span></label>
+                <input id="local" name="local" maxlength="20" required>
+                <small class="field-error"></small>
+              </div>
+
+              <div class="field">
+                <label for="data">Data</label>
+                <input type="date" id="data" name="data" disabled>
+                <small class="field-error"></small>
+              </div>
+            </div>
+
+            <label class="declaration-box">
+              <input type="checkbox" id="ciente_responsabilidade" name="ciente_responsabilidade" required>
+              <span>
+                Declaro estar ciente da minha responsabilidade pelo correto preenchimento do formulário e de que
+                informações inexatas podem causar atraso, devolução ou impossibilidade de cumprimento da solicitação.
+              </span>
+            </label>
+            <small class="group-error" data-group-error-for="ciente_responsabilidade"></small>
+          </div>
+
+          <div class="card">
+            <h3>Resumo final</h3>
+            <div class="summary-box" id="summaryBox">
+              Revise os dados antes de validar o formulário.
+            </div>
+          </div>
+        </section>
+
+        <div class="inline-alert hidden" id="alertaDivisaoCreditoFooter"></div>
+
+        <div class="nav-actions">
+          <button type="button" id="prevBtn" class="secondary-btn">Voltar</button>
+          <button type="button" id="nextBtn" class="primary-btn">Continuar</button>
+          <button type="submit" id="submitBtn" class="primary-btn hidden">Validar formulário</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/formulario.js') }}"></script>
+</body>
+
+</html>
