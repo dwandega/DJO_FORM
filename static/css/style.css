@@ -375,7 +375,88 @@ input.valor-input::placeholder {
 }
 
 .label-prefixo_outra_uf{
-  color: #e8391a;
+  color: #5c0000;
+}
+
+.info-aviso {
+  margin-top: -6px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  color: #6b7280;
+  letter-spacing: 0.02em;
+}
+
+
+
+.info-btn {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid #cfd6e2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+  color: #0033a0;
+  background: #f5f7fb;
+}
+
+.info-btn:hover {
+  background: #e9eef6;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.overlay.show {
+  display: flex;
+}
+
+.sobre-box {
+  background: white;
+  padding: 28px;
+  border-radius: 18px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+.sobre-box h4 {
+  margin-top: 0;
+}
+
+.version {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-left: 6px;
+}
+
+.ano {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.fechar-btn {
+  margin-top: 18px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: #0033a0;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.fechar-btn:hover {
+  background: #1d2a7a;
 }
 
 @media (max-width: 640px) {

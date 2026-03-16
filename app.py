@@ -23,7 +23,7 @@ def write_text(page, x, y, text, size=10):
         text,
         fontsize=size,
         fontname="helv",
-        color=(0, 0, 0)
+        color=(0, 0, 0.3)
     )
 
 

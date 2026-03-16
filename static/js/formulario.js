@@ -843,6 +843,14 @@ function isValidPhone(value) {
   return digits.length === 10 || digits.length === 11;
 }
 
+function abrirSobre() {
+  document.getElementById("overlaySobre").classList.add("show");
+}
+
+function fecharSobre() {
+  document.getElementById("overlaySobre").classList.remove("show");
+}
+
 function updateDynamicSections() {
   updateContaJudicial();
   updateFormaRecebimento();

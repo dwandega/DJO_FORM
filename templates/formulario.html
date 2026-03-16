@@ -5,18 +5,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Solicitação de Resgate</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='70' font-size='90' text-anchor='middle'>⚖️</text></svg>">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
   <div class="app-shell">
     <header class="topbar">
+
+
+
       <div class="brand">
         <img src="{{ url_for('static', filename='logoBB.png') }}" alt="Logo BB" class="brand-logo">
         <div class="brand-text">
           <h1>Solicitação de Resgate</h1>
           <p>Formulário organizado em etapas para facilitar seu preenchimento.</p>
         </div>
+        <div class="info-btn" onclick="abrirSobre()">i</div>
       </div>
     </header>
 
@@ -47,7 +52,7 @@
             <div class="form-grid two-cols">
               <div class="field">
                 <label for="beneficiario_nome">Nome do beneficiário <span class="req">*</span></label>
-                <input id="beneficiario_nome" name="beneficiario_nome" required>
+                <input id="beneficiario_nome" name="beneficiario_nome" maxlength="56" required>
                 <small class="field-error"></small>
               </div>
 
@@ -64,7 +69,7 @@
             <div class="form-grid two-cols">
               <div class="field">
                 <label for="representante_nome">Nome do representante legal ou procurador</label>
-                <input id="representante_nome" name="representante_nome">
+                <input id="representante_nome" name="representante_nome" maxlength="56">
                 <small class="field-error"></small>
               </div>
 
@@ -205,6 +210,7 @@
 
           <div class="card hidden" id="blocoCreditoBeneficiario">
             <h3>6.1 Dados para crédito ao beneficiário</h3>
+            <div class="info-aviso">!! Vedado crédito à terceiros</div>
 
             <div class="form-grid banco-grid">
               <div class="field bank-name-field">
@@ -352,6 +358,7 @@
 
           <div class="card hidden" id="blocoCreditoRepresentante">
             <h3>6.2 Dados para crédito ao representante legal</h3>
+            <div class="info-aviso">!! Vedado crédito à terceiros</div>
 
             <div class="form-grid banco-grid">
               <div class="field bank-name-field">
@@ -500,7 +507,7 @@
             <h3>6. Pagamento em espécie</h3>
             <div class="form-grid two-cols">
               <div class="field">
-                <label for="prefixo_outra_uf">Prefixo da agência em outra UF</label>
+                <label for="prefixo_outra_uf" class="label-prefixo_outra_uf"> Prefixo da agência em outra UF</label>
                 <input id="prefixo_outra_uf" name="prefixo_outra_uf" placeholder="Informe apenas se for em outra UF">
                 <small class="field-error"></small>
               </div>
@@ -550,7 +557,8 @@
 
             <div class="inline-alert hidden" id="alertaAnalfabeto">
               <p>Esta opção é voltada apenas para preenchimento por parte do beneficiário.</p>
-              <p>O formulário deverá ser impresso e apresentado na agência pelo beneficiário, acompanhado de duas testemunhas que
+              <p>O formulário deverá ser impresso e apresentado na agência pelo beneficiário, acompanhado de duas
+                testemunhas que
                 possam assinar.</p>
             </div>
           </div>
@@ -636,6 +644,15 @@
   </div>
 
   <script src="{{ url_for('static', filename='js/formulario.js') }}"></script>
+
+  <div class="overlay" id="overlaySobre">
+    <div class="sobre-box">
+      <h4>Interface auxiliar para formulário de resgate judicial <span class="version">Ver. 1.0.0</span></h4>
+      <p>Diego Wandega de Santana <span class="ano">© 2026</span></p>
+
+      <div class="fechar-btn" onclick="fecharSobre()">Fechar</div>
+    </div>
+  </div>
 </body>
 
 </html>
