@@ -44,28 +44,54 @@ function digitsOnly(value) {
 }
 
 function formatarTituloSimples(texto) {
-    return texto
-        .toLowerCase()
-        .split(" ")
-        .filter(parte => parte.trim() !== "")
-        .map(parte => parte.charAt(0).toUpperCase() + parte.slice(1))
-        .join(" ");
+  return texto
+    .toLowerCase()
+    .split(" ")
+    .filter(parte => parte.trim() !== "")
+    .map(parte => parte.charAt(0).toUpperCase() + parte.slice(1))
+    .join(" ");
 }
 
 function formatarNomePessoa(texto) {
-    const excecoes = ["da", "de", "do", "das", "dos", "e"];
+  const excecoes = ["da", "de", "do", "das", "dos", "e"];
 
-    return texto
-        .toLowerCase()
-        .split(" ")
-        .filter(parte => parte.trim() !== "")
-        .map((parte, index) => {
-            if (index > 0 && excecoes.includes(parte)) {
-                return parte;
-            }
-            return parte.charAt(0).toUpperCase() + parte.slice(1);
-        })
-        .join(" ");
+  return texto
+    .toLowerCase()
+    .split(" ")
+    .filter(parte => parte.trim() !== "")
+    .map((parte, index) => {
+      if (index > 0 && excecoes.includes(parte)) {
+        return parte;
+      }
+      return parte.charAt(0).toUpperCase() + parte.slice(1);
+    })
+    .join(" ");
+}
+
+function formatarNumeroProcesso(valor) {
+  const digits = String(valor || "").replace(/\D/g, "").slice(0, 20);
+
+  let resultado = "";
+
+  if (digits.length > 0)
+    resultado += digits.slice(0, 7);
+
+  if (digits.length >= 8)
+    resultado += "-" + digits.slice(7, 9);
+
+  if (digits.length >= 10)
+    resultado += "." + digits.slice(9, 13);
+
+  if (digits.length >= 14)
+    resultado += "." + digits.slice(13, 14);
+
+  if (digits.length >= 15)
+    resultado += "." + digits.slice(14, 16);
+
+  if (digits.length >= 17)
+    resultado += "." + digits.slice(16, 20);
+
+  return resultado;
 }
 
 function applyNumericOnly(input, maxLength = null) {
@@ -415,6 +441,10 @@ function updateIR() {
   }
 
   toggleHidden(alertaIR, !(visible && isento === "sim"));
+
+  const blocoIsencao = document.getElementById("blocoIsencaoIR");
+  toggleHidden(blocoIsencao, !(visible && isento === "sim"));
+
 }
 
 function updateAnalfabeto() {
@@ -432,6 +462,14 @@ function updateRepresentacao() {
 
   const show = !!representanteNome || !!representanteDoc || (forma === "credito" && (destino === "representante" || destino === "ambos"));
   toggleHidden(alerta, !show);
+}
+
+function abrirInstrucoes() {
+  document.getElementById("overlayInstrucoes").style.display = "flex";
+}
+
+function fecharInstrucoes() {
+  document.getElementById("overlayInstrucoes").style.display = "none";
 }
 
 function updateChecklist() {
@@ -579,6 +617,67 @@ function validateStep(stepNumber) {
   const visibleFields = Array.from(
     step.querySelectorAll("input, select, textarea")
   ).filter((field) => field.offsetParent !== null);
+
+
+  // Validação cruzada do representante (se tem nome, tem que ter cpf)
+  const repNome = document.getElementById("representante_nome");
+  const repDoc = document.getElementById("representante_cpf_cnpj");
+
+  const destino = getCheckedValue("credito_destino");
+
+  if (repNome && repDoc) {
+    const nomePreenchido = repNome.value.trim() !== "";
+    const docPreenchido = repDoc.value.trim() !== "";
+
+    if (nomePreenchido !== docPreenchido) {
+      valid = false;
+
+      if (!nomePreenchido) {
+        repNome.classList.add("invalid");
+        const container = repNome.closest(".field") || repNome.parentElement;
+        appendFieldError(container, "Informe o nome do representante.");
+      }
+
+      if (!docPreenchido) {
+        repDoc.classList.add("invalid");
+        const container = repDoc.closest(".field") || repDoc.parentElement;
+        appendFieldError(container, "Informe o CPF/CNPJ do representante.");
+      }
+
+      if (!firstInvalid) {
+        firstInvalid = nomePreenchido ? repDoc : repNome;
+      }
+    }   
+  }
+
+  if (destino === "representante" || destino === "ambos") {
+    const repNome = document.getElementById("representante_nome");
+    const repDoc = document.getElementById("representante_cpf_cnpj");
+
+    const nomePreenchido = repNome?.value.trim() !== "";
+    const docPreenchido = repDoc?.value.trim() !== "";
+
+    if (!nomePreenchido || !docPreenchido) {
+      valid = false;
+
+      if (!nomePreenchido && repNome) {
+        repNome.classList.add("invalid");
+        const container = repNome.closest(".field") || repNome.parentElement;
+        appendFieldError(container, "Informe o nome do representante.");
+      }
+
+      if (!docPreenchido && repDoc) {
+        repDoc.classList.add("invalid");
+        const container = repDoc.closest(".field") || repDoc.parentElement;
+        appendFieldError(container, "Informe o CPF do representante.");
+      }
+
+      if (!firstInvalid) {
+        firstInvalid = repNome || repDoc;
+      }
+    }
+  }
+
 
   // Validação específica da etapa 3: divisão entre beneficiário e representante
   if (stepNumber === 3) {
@@ -973,93 +1072,124 @@ document.addEventListener("DOMContentLoaded", () => {
   applyCurrencyMask(document.getElementById("cr_valor_fixo"));
   applyCurrencyMask(document.getElementById("cr_valor_parcial"));
 
-    function formatarTituloSimples(texto) {
-        return texto
-            .toLowerCase()
-            .split(" ")
-            .filter(parte => parte.trim() !== "")
-            .map(parte => parte.charAt(0).toUpperCase() + parte.slice(1))
-            .join(" ");
-    }
 
-    function formatarContaComDigito(valor) {
-      const numeros = valor.replace(/\D/g, "");
+  const campoProcesso = document.getElementById("ir_processo");
 
-      if (!numeros) return "";
-
-      if (numeros.length === 1) {
-        return `-${numeros}`;
-      }
-
-      const corpo = numeros.slice(0, -1);
-      const digito = numeros.slice(-1);
-
-      return `${corpo}-${digito}`;
-    }
-
-    const camposConta = [
-      document.getElementById("cb_conta"),
-      document.getElementById("cr_conta")
-    ];
-
-    camposConta.forEach(campo => {
-      if (campo) {
-        campo.addEventListener("input", function () {
-          this.value = formatarContaComDigito(this.value);
-        });
-      }
+  if (campoProcesso) {
+    campoProcesso.addEventListener("input", function () {
+      this.value = formatarNumeroProcesso(this.value);
     });
+  }
 
-    function formatarNomePessoa(texto) {
-        const excecoes = ["da", "de", "do", "das", "dos", "e"];
+  function formatarTituloSimples(texto) {
+    return texto
+      .toLowerCase()
+      .split(" ")
+      .filter(parte => parte.trim() !== "")
+      .map(parte => parte.charAt(0).toUpperCase() + parte.slice(1))
+      .join(" ");
+  }
 
-        return texto
-            .toLowerCase()
-            .split(" ")
-            .filter(parte => parte.trim() !== "")
-            .map((parte, index) => {
-                if (index > 0 && excecoes.includes(parte)) {
-                    return parte;
-                }
-                return parte.charAt(0).toUpperCase() + parte.slice(1);
-            })
-            .join(" ");
+  campoProcesso.addEventListener("blur", function () {
+    const digits = this.value.replace(/\D/g, "");
+
+    if (digits.length === 0) return;
+
+    const padded = digits.padStart(20, "0");
+
+    this.value =
+      padded.slice(0, 7) + "-" +
+      padded.slice(7, 9) + "." +
+      padded.slice(9, 13) + "." +
+      padded.slice(13, 14) + "." +
+      padded.slice(14, 16) + "." +
+      padded.slice(16, 20);
+  });
+
+  function formatarContaComDigito(valor) {
+    const numeros = valor.replace(/\D/g, "");
+
+    if (!numeros) return "";
+
+    if (numeros.length === 1) {
+      return `-${numeros}`;
     }
 
-      const campoData = document.getElementById("data");
-      if (campoData) {
-        const hoje = new Date();
-        const ano = hoje.getFullYear();
-        const mes = String(hoje.getMonth() + 1).padStart(2, "0");
-        const dia = String(hoje.getDate()).padStart(2, "0");
-        campoData.value = `${ano}-${mes}-${dia}`;
-      }
+    const corpo = numeros.slice(0, -1);
+    const digito = numeros.slice(-1);
 
-    const campoLocal = document.getElementById("local");
-    if (campoLocal) {
-        campoLocal.addEventListener("input", function () {
-            this.value = this.value.slice(0, 20);
-        });
+    return `${corpo}-${digito}`;
+  }
 
-        campoLocal.addEventListener("blur", function () {
-            this.value = formatarTituloSimples(this.value);
-        });
+  const camposConta = [
+    document.getElementById("cb_conta"),
+    document.getElementById("cr_conta")
+  ];
+  
+
+  camposConta.forEach(campo => {
+    if (campo) {
+      campo.addEventListener("input", function () {
+        this.value = formatarContaComDigito(this.value);
+      });
     }
+  });
 
-    const camposNome = [
-        document.getElementById("beneficiario_nome"),
-        document.getElementById("representante_nome"),
-        document.getElementById("cb_nome"),
-        document.getElementById("cr_nome")
-    ];
+  function formatarNomePessoa(texto) {
+    const excecoes = ["da", "de", "do", "das", "dos", "e"];
 
-    camposNome.forEach(campo => {
-        if (campo) {
-            campo.addEventListener("blur", function () {
-                this.value = formatarNomePessoa(this.value);
-            });
+    return texto
+      .toLowerCase()
+      .split(" ")
+      .filter(parte => parte.trim() !== "")
+      .map((parte, index) => {
+        if (index > 0 && excecoes.includes(parte)) {
+          return parte;
         }
+        return parte.charAt(0).toUpperCase() + parte.slice(1);
+      })
+      .join(" ");
+  }
+
+  const campoData = document.getElementById("data");
+  if (campoData) {
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+    const dia = String(hoje.getDate()).padStart(2, "0");
+    campoData.value = `${ano}-${mes}-${dia}`;
+  }
+
+  const irValor = document.getElementById("ir_valor");
+  if (irValor) {
+    applyCurrencyMask(irValor);
+}
+
+  const campoLocal = document.getElementById("local");
+  if (campoLocal) {
+    campoLocal.addEventListener("input", function () {
+      this.value = this.value.slice(0, 20);
     });
+
+    campoLocal.addEventListener("blur", function () {
+      this.value = formatarTituloSimples(this.value);
+    });
+  }
+
+  const camposNome = [
+    document.getElementById("beneficiario_nome"),
+    document.getElementById("representante_nome"),
+    document.getElementById("cb_nome"),
+    document.getElementById("cr_nome")
+  ];
+
+  camposNome.forEach(campo => {
+    if (campo) {
+      campo.addEventListener("blur", function () {
+        this.value = formatarNomePessoa(this.value);
+      });
+    }
+  });
 
 
   Object.entries(bankList).forEach(([code, name]) => {
@@ -1119,22 +1249,71 @@ document.addEventListener("DOMContentLoaded", () => {
     applyNumericOnly(input, maxMap[id] || null);
   });
 
-document.querySelectorAll(".link-action").forEach((link) => {
-  link.addEventListener("click", (e) => {
-    e.preventDefault();
-    const source = link.dataset.import;
-    const target = link.dataset.target;
-    importPersonData(source, target);
+  document.querySelectorAll(".link-action").forEach((link) => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const source = link.dataset.import;
+      const target = link.dataset.target;
+      importPersonData(source, target);
+    });
   });
-});
 
-document.getElementById("cb_banco_select")?.addEventListener("change", () => {
-  updateTipoConta("cb");
-});
+  document.getElementById("cb_banco_select")?.addEventListener("change", () => {
+    updateTipoConta("cb");
+  });
 
-document.getElementById("cr_banco_select")?.addEventListener("change", () => {
-  updateTipoConta("cr");
-});
+  document.getElementById("cr_banco_select")?.addEventListener("change", () => {
+    updateTipoConta("cr");
+  });
+
+  document.getElementById("beneficiario_nome").addEventListener("input", (e) => {
+    const irNome = document.getElementById("ir_nome");
+    if (irNome) irNome.value = e.target.value;
+  });
+
+
+  const docInput = document.getElementById("beneficiario_cpf_cnpj");
+  const simplesRadio = document.querySelector('input[name="ir_tipo"][value="simples"]');
+
+  function atualizarSimplesNacional() {
+    if (!docInput || !simplesRadio) return;
+
+    const digits = docInput.value.replace(/\D/g, "");
+
+    const isCNPJ = digits.length === 14;
+
+    simplesRadio.disabled = !isCNPJ;
+
+    // Se não for CNPJ, desmarca automaticamente
+    if (!isCNPJ && simplesRadio.checked) {
+      simplesRadio.checked = false;
+    }
+  }
+
+  if (docInput) {
+    docInput.addEventListener("input", atualizarSimplesNacional);
+  }
+
+  const radios = document.querySelectorAll('input[name="ir_tipo"]');
+  const valorInput = document.getElementById("ir_valor");
+
+  function atualizarIRTipo() {
+    const selecionado = document.querySelector('input[name="ir_tipo"]:checked');
+
+    if (!valorInput) return;
+
+    if (selecionado && selecionado.value === "montante") {
+      valorInput.style.display = "block";
+    } else {
+      valorInput.style.display = "none";
+      valorInput.value = "";
+    }
+  }
+
+  radios.forEach(r => r.addEventListener("change", atualizarIRTipo));
+
+  atualizarIRTipo();
+
 
   showStep(1);
   updateDynamicSections();

@@ -3,11 +3,14 @@ from datetime import datetime
 import fitz  # PyMuPDF
 import tempfile
 import os
+import io
+
 
 app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PDF_BASE = os.path.join(BASE_DIR, "pdf", "Formulário Resgate 2.pdf")
+PDF_ISENCAO = os.path.join(BASE_DIR, "pdf", "Declaração Isenção IR 2.pdf")
 
 
 def write_text(page, x, y, text, size=10):
@@ -204,7 +207,7 @@ def gerar_pdf():
         }
 
         ESPECIE_FIELD_MAP = {
-            "agencia_pagamento_prefixo": {"page": 0, "x": 458, "y": 608, "size": 11},
+            "prefixo_outra_uf": {"page": 0, "x": 220, "y": 608, "size": 11},
         }
 
         IR_ISENCAO_MAP = {
@@ -277,6 +280,11 @@ def gerar_pdf():
                     mark_x(page, cfg["x"], cfg["y"], cfg["size"])
 
                 cb_valor_tipo = data.get("cb_valor_tipo")
+
+                # ajuste: percentual usa mesma posição de parcial
+                if cb_valor_tipo == "percentual":
+                    cb_valor_tipo = "parcial"
+
                 cfg = CB_VALOR_TIPO_MAP.get(cb_valor_tipo)
                 if cfg:
                     page = doc[cfg["page"]]
@@ -299,6 +307,11 @@ def gerar_pdf():
                     mark_x(page, cfg["x"], cfg["y"], cfg["size"])
 
                 cr_valor_tipo = data.get("cr_valor_tipo")
+
+                # ajuste: percentual usa mesma posição de parcial
+                if cr_valor_tipo == "percentual":
+                    cr_valor_tipo = "parcial"
+
                 cfg = CR_VALOR_TIPO_MAP.get(cr_valor_tipo)
                 if cfg:
                     page = doc[cfg["page"]]
@@ -340,18 +353,24 @@ def gerar_pdf():
         cfg = CONTATO_FIELD_MAP["ano_data"]
         write_text(doc[cfg["page"]], cfg["x"], cfg["y"], ano_data, cfg["size"])
 
-        if beneficiario_analfabeto != "sim" and len(doc) > 1:
-            doc.delete_page(1)
+        #if beneficiario_analfabeto != "sim" and len(doc) > 1:
+            #doc.delete_page(1)
 
-        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-        tmp_path = tmp.name
-        tmp.close()
+        if data.get("isento_ir") == "sim":
+            pdf_isencao_bytes = gerar_pdf_isencao(data)
+            pdf_isencao_bytes.seek(0)
+            doc_isencao = fitz.open(stream=pdf_isencao_bytes.read(), filetype="pdf")
+            doc.insert_pdf(doc_isencao) 
+            doc_isencao.close()
 
-        doc.save(tmp_path)
+        pdf_bytes = io.BytesIO()
+        doc.save(pdf_bytes)
         doc.close()
 
+        pdf_bytes.seek(0)
+
         return send_file(
-            tmp_path,
+            pdf_bytes,
             as_attachment=True,
             download_name="formulario_resgate_preenchido.pdf",
             mimetype="application/pdf"
@@ -359,6 +378,105 @@ def gerar_pdf():
 
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
+
+
+
+def gerar_pdf_isencao(data):  
+
+    for k, v in data.items():
+        print(k, "=>", v)
+
+    ISENCAO_FIELD_MAP = {
+        "beneficiario_nome": {"x": 120, "y": 115, "size": 11},
+        "ir_endereco": {"x": 120, "y": 140, "size": 11},
+        "beneficiario_cpf_cnpj": {"x": 320, "y": 165, "size": 11},
+    }
+
+    ISENCAO_PROCESSO_MAP = {
+        "ir_processo": {"x": 240, "y": 190, "size": 11},
+        "ir_numero_vara": {"x": 100, "y": 210, "size": 11},
+        "ir_especificacao_vara": {"x": 150, "y": 210, "size": 11},
+    }
+
+    ISENCAO_PROCESSO_MAP = {
+        "ir_processo": {"x": 240, "y": 190, "size": 11},
+        "ir_numero_vara": {"x": 100, "y": 210, "size": 11},
+        "ir_especificacao_vara": {"x": 150, "y": 210, "size": 11},
+    }
+
+    ISENCAO_CHECK_MAP = {
+        "montante": {"x": 60, "y": 240, "size": 11},
+        "simples": {"x": 60, "y": 270, "size": 11},
+    }
+
+    ISENCAO_VALOR_MAP = {
+        "ir_valor": {"x": 200, "y": 240, "size": 11},
+    }
+
+    ISENCAO_DATA_MAP = {
+        "local": {"x": 100, "y": 320, "size": 11},
+        "uf": {"x": 260, "y": 320, "size": 11},
+        "dia": {"x": 320, "y": 320, "size": 11},
+        "mes": {"x": 350, "y": 320, "size": 11},
+        "ano": {"x": 430, "y": 320, "size": 11},
+    }
+
+    doc = fitz.open(PDF_ISENCAO)
+    page = doc[0]
+
+    write_text(page, 65, 230, data.get("beneficiario_nome"), size=11)
+    write_text(page, 65, 250, data.get("ir_endereco"), size=11)
+    write_text(page, 77, 272, data.get("beneficiario_cpf_cnpj"), size=11)
+
+    write_text(page, 320, 312, data.get("ir_processo"), size=11)
+    write_text(page, 70, 334, data.get("ir_numero_vara"), size=11)
+    write_text(page, 275, 334, data.get("ir_comarca"), size=11)
+
+    tipo = data.get("ir_tipo")
+
+    if tipo == "montante":
+        mark_x(page, 76.1, 380.1)
+        write_text(page, 185, 380, data.get("ir_valor"), size=11)
+
+    elif tipo == "simples":
+        mark_x(page, 76.5, 426)
+
+    # data automática
+    hoje = datetime.now()
+
+    hoje_str = hoje.strftime("%Y-%m-%d")
+    dia, mes, ano = formatar_data_pdf(hoje_str)
+
+
+    write_text(page, 221, 621, ".", size=11)
+    write_text(page, 224, 621, ".", size=11)
+    write_text(page, 227, 621, ".", size=11)
+    write_text(page, 230, 621, ".", size=11)
+    write_text(page, 233, 621, ".", size=11)
+    write_text(page, 236, 621, ".", size=11)
+    write_text(page, 239, 621, ".", size=11)
+    write_text(page, 242, 621, ".", size=11)
+    write_text(page, 245, 621, ".", size=11)
+    write_text(page, 248, 621, ".", size=11)
+    write_text(page, 251, 621, ".", size=11)
+
+
+    write_text(page, 221, 617, data.get("local"), size=10)
+    write_text(page, 330, 617, data.get("ir_uf"), size=11)
+    write_text(page, 352, 617, dia, size=11)
+    write_text(page, 390, 617, mes, size=11)
+    write_text(page, 480, 617, ano, size=11)
+
+    pdf_bytes = io.BytesIO()
+    doc.save(pdf_bytes)
+    doc.close()
+
+    pdf_bytes.seek(0)
+
+    return pdf_bytes
+
+
+
 
 
 if __name__ == "__main__":

@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Solicitação de Resgate</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='70' font-size='90' text-anchor='middle'>⚖️</text></svg>">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='70' font-size='90' text-anchor='middle'>⚖️</text></svg>">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
@@ -40,6 +41,9 @@
 
         <div class="progress-actions">
           <button type="button" id="toggleAllBtn" class="ghost-btn">Ver formulário completo</button>
+          <div class="info-link-wrap">
+            <a href="#" onclick="abrirInstrucoes(); return false;" class="info-link">📄 consultar informações gerais</a>
+          </div>
         </div>
       </section>
 
@@ -134,19 +138,19 @@
               <div class="form-grid three-cols">
                 <div class="field">
                   <label for="conta_judicial_1">Conta judicial 1</label>
-                  <input id="conta_judicial_1" name="conta_judicial_1">
+                  <input id="conta_judicial_1" name="conta_judicial_1" maxlength="9">
                   <small class="field-error"></small>
                 </div>
 
                 <div class="field">
                   <label for="conta_judicial_2">Conta judicial 2</label>
-                  <input id="conta_judicial_2" name="conta_judicial_2">
+                  <input id="conta_judicial_2" name="conta_judicial_2" maxlength="9">
                   <small class="field-error"></small>
                 </div>
 
                 <div class="field">
                   <label for="conta_judicial_3">Conta judicial 3</label>
-                  <input id="conta_judicial_3" name="conta_judicial_3">
+                  <input id="conta_judicial_3" name="conta_judicial_3" maxlength="9">
                   <small class="field-error"></small>
                 </div>
               </div>
@@ -161,13 +165,13 @@
             <h3>5. Forma de recebimento <span class="req">*</span></h3>
 
             <div class="choice-list">
-              <label class="choice-card">
+              <label class="choice-card hidden">
                 <input type="radio" name="forma_recebimento" value="autorizacao_permanente" required>
                 <span><strong>Autorização permanente para crédito em conta do beneficiário no Banco do
                     Brasil</strong></span>
               </label>
 
-              <label class="choice-card">
+              <label class="choice-card hidden">
                 <input type="radio" name="forma_recebimento" value="convenio_djc" required>
                 <span><strong>Convênio de resgate centralizado – DJC</strong></span>
               </label>
@@ -507,7 +511,9 @@
             <h3>6. Pagamento em espécie</h3>
             <div class="form-grid two-cols">
               <div class="field">
-                <label for="prefixo_outra_uf" class="label-prefixo_outra_uf"> Prefixo da agência em outra UF</label>
+                <label>Autorizado em qualquer agência na UF de jurisdição do Tribunal.</label>
+                <label for="prefixo_outra_uf" class="label-prefixo_outra_uf">Em caso de saque em outra UF, informe o
+                  prefixo da agência:</label>
                 <input id="prefixo_outra_uf" name="prefixo_outra_uf" placeholder="Informe apenas se for em outra UF">
                 <small class="field-error"></small>
               </div>
@@ -537,6 +543,66 @@
               Quando por representante legal, a procuração precisa de poderes específicos para tal.
             </div>
           </div>
+
+
+          <div class="card hidden" id="blocoIsencaoIR">
+            <h3>Declaração de Isenção de IR</h3>
+
+            <!-- Endereço -->
+            <div class="field">
+              <label>Endereço</label>
+              <input id="ir_endereco" name="ir_endereco" required maxlength="65">
+            </div>
+
+            <br>
+
+            <!-- Linha única: Processo + Vara + UF -->
+            <div class="form-grid ir-linha-unica">
+
+              <div class="field">
+                <label>Nº do processo</label>
+                <input id="ir_processo" name="ir_processo" required maxlength="20">
+              </div>
+
+              <div class="field">
+                <label>Vara</label>
+                <div class="ir-vara-group">
+                  <input id="ir_numero_vara" name="ir_numero_vara" maxlength="2" placeholder="Nº" required>
+                  <input id="ir_especificacao_vara" name="ir_comarca" placeholder="Comarca" required maxlength="16">
+                </div>
+              </div>
+
+              <div class="field">
+                <label>UF</label>
+                <input id="ir_uf" name="ir_uf" maxlength="2" required class="uf-input">
+              </div>
+
+            </div>
+            
+            <br>
+
+            <!-- Tipo de declaração -->
+            <div class="field">
+              <div class="ir-row-inline">
+
+                <!-- Simples Nacional -->
+                <div class="ir-option">
+                  <input type="radio" name="ir_tipo" value="simples" id="ir_tipo_simples">
+                  <label for="ir_tipo_simples">Simples Nacional</label>
+                </div>
+
+                <!-- Montante + valor -->
+                <div class="ir-option">
+                  <input type="radio" name="ir_tipo" value="montante" id="ir_tipo_montante">
+                  <label for="ir_tipo_montante">Montante</label>
+
+                  <input id="ir_valor" name="ir_valor" class="valor-input" placeholder="Valor sem rendimentos">
+                </div>
+
+              </div>
+            </div>
+          </div>
+
 
           <div class="card">
             <h3>Situação excepcional</h3>
@@ -653,6 +719,67 @@
       <div class="fechar-btn" onclick="fecharSobre()">Fechar</div>
     </div>
   </div>
+
+  <div id="overlayInstrucoes" class="overlay">
+    <div class="card" style="max-width: 720px; max-height: 80vh; overflow-y: auto;">
+
+      <h3>Informações gerais</h3>
+
+      <h4>📌 Sobre o resgate</h4>
+      <ul>
+        <li>A indisponibilidade dos autos para os trabalhos de verificação da regularidade da liberação do(s) mandado(s)
+          de resgate,
+          localização do depósito judicial e outros motivos de força maior, alheios à vontade do Banco, podem impedir o
+          pagamento na data prevista.</li>
+        <li>O resgate será efetuado em até dois dias úteis, salvo nos casos em que houver alguma inconsistência nos
+          dados de resgate constantes no alvará ou no formulário.</li>
+        <li>Este formulário não prevalece sobre as determinações ou orientações contidas no documento de resgate.</li>
+        <li>Caso o mandado de levantamento judicial seja devolvido por erro de preenchimento do solicitante, o prazo
+          será reiniciado e será
+          contado a partir da entrega do Formulário, com as informações corretas.</li>
+      </ul>
+
+      <h4>⚖️ Levantamento por procuração</h4>
+      <ul>
+        <li>A procuração outorgada a terceiros, incluído o advogado legalmente constituído no processo, deve ter sido
+          emitida há menos de dois anos
+          e ser apresentada por instrumento público ou particular, em via original, com assinatura reconhecida como
+          verdadeira ou por autenticidade,
+          com poderes específicos para receber e dar quitação, sendo recomendável ainda indicar o número do processo, ou
+          da conta judicial, ou do Alvará/Ofício
+          Judicial (nos casos de levantamento por alvará).</li>
+        <li><strong>Para os resgates por meio de procurador, envolvendo Precatório Federal ou RPV Federal, somente
+            poderão ser feitos mediante
+            procuração específica, da qual conste o número da conta de depósito ou número de registro de pagamento no
+            tribunal, Conforme Resolução 822/2023 do CJF,</strong></li>
+        <li> A procuração ad judicia, conferida ao advogado para atuar no processo, é aceita desde que contenha cláusula
+          ad negotia,
+          ou seja, poderes específicos para receber e dar quitação. A procuração ad judicia deve vir, obrigatoriamente,
+          acompanhada de
+          certidão emitida até 30 dias antes pelo cartório da vara/juizado, ou por meio eletrônico, em que tramitam os
+          autos do processo,
+          atestando que o advogado que se apresenta para fazer o levantamento está habilitado no processo. É dispensável
+          o
+          reconhecimento de firma em procuração ad judicia. De acordo com artigo 105 do Código de Processo Civil, a
+          ausência de
+          poder específico para receber e dar quitação impede que a procuração ad judicia seja aceita para esse fim.
+        <li>Procurações emitidas por tabelionatos de outros municípios devem conter o reconhecimento do sinal público
+          pelo tabelião local.</li>
+      </ul>
+
+      <h4>⚠️ Importante</h4>
+      <ul>
+        <li>Dados incorretos podem impedir o pagamento.</li>
+        <li>O banco não se responsabiliza por erros no preenchimento.</li>
+      </ul>
+
+      <div style="text-align: right; margin-top: 16px;">
+        <button onclick="fecharInstrucoes()" class="primary-btn">Fechar</button>
+      </div>
+
+    </div>
+  </div>
+
 </body>
 
 </html>

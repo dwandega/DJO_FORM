@@ -345,16 +345,6 @@ input.valor-input::placeholder {
   background: #fff7f7;
 }
 
-@media (max-width: 900px) {
-  .two-cols,
-  .three-cols,
-  .choice-list.compact,
-  .value-type-row,
-  .banco-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .label-with-action {
   display: flex;
   align-items: center;
@@ -374,7 +364,7 @@ input.valor-input::placeholder {
   text-decoration: underline;
 }
 
-.label-prefixo_outra_uf{
+.label-prefixo_outra_uf {
   color: #5c0000;
 }
 
@@ -410,7 +400,7 @@ input.valor-input::placeholder {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: none;
   align-items: center;
   justify-content: center;
@@ -427,7 +417,7 @@ input.valor-input::placeholder {
   border-radius: 18px;
   width: 320px;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
 }
 
 .sobre-box h4 {
@@ -457,6 +447,86 @@ input.valor-input::placeholder {
 
 .fechar-btn:hover {
   background: #1d2a7a;
+}
+
+.info-link-wrap {
+  margin-top: 6px;
+  text-align: right;
+}
+
+.info-link {
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-decoration: none;
+}
+
+.info-link:hover {
+  text-decoration: underline;
+  color: #0033a0;
+}
+
+/* Linha com processo + vara + UF */
+.ir-linha-unica {
+  grid-template-columns: 2fr 2fr 0.5fr;
+  gap: 12px;
+}
+
+/* Grupo da vara */
+.ir-vara-group {
+  display: flex;
+  gap: 8px;
+}
+
+.ir-vara-group input:first-child {
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.ir-vara-group input:last-child {
+  flex: 1;
+}
+
+/* linha horizontal */
+.ir-row-inline {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+/* cada opção */
+.ir-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* radio bonitinho */
+.ir-option input[type="radio"] {
+  width: auto;
+  min-height: auto;
+}
+
+/* input do valor */
+.ir-option .valor-input {
+  margin-left: 10px;
+  width: 220px;
+}
+
+.uf-input {
+  text-transform: uppercase;
+  max-width: 70px;
+}
+
+@media (max-width: 900px) {
+
+  .two-cols,
+  .three-cols,
+  .choice-list.compact,
+  .value-type-row,
+  .banco-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -497,4 +567,24 @@ input.valor-input::placeholder {
   .ghost-btn {
     width: 100%;
   }
+
+  .ir-linha-unica {
+    grid-template-columns: 1fr;
+  }
+
+  .ir-row-inline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .ir-option {
+    width: 100%;
+  }
+
+  .ir-option .valor-input {
+    width: 100%;
+    margin-left: 0;
+  }
+
 }
